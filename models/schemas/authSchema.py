@@ -9,14 +9,11 @@ class RegisterUser(BaseModel):
     
     class Config:
         orm_mode = True
-        
 
-class OAuthUser(BaseModel):
+class ResetPassword(BaseModel):
     
-    full_name: str
-    email: str
-    signup_type : str
-    
-    
+    password: str
+    confirm_password: str
+
     class Config:
         orm_mode = True

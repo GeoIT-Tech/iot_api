@@ -144,7 +144,7 @@ def ResendOTP(request: Request, email: str, db: Session = Depends(get_db)):
     
     
 @router.patch('/forget_password_verification/{email}')
-def UserVerification(request: Request, otp: int, password_data: userSchema.ResetPassword, email: str, db: Session = Depends(get_db)):
+def UserVerification(request: Request, otp: int, password_data: authSchema.ResetPassword, email: str, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email == email).first()
     if db_user:
         db_code = db.query(models.ResetPasswordCode).filter(models.ResetPasswordCode.user_uuid == db_user.uuid, models.ResetPasswordCode.consumed == False).first()
@@ -256,25 +256,4 @@ def DeleteUser( request: Request, request_uuid: UUID, reason: str, comment: str,
     except JWTError:
         raise HTTPException(status_code=401, detail='Unauthorized')
     
-    
-@router.patch('/upload_profile_photo')
-def UploadProfilePhoto(request: Request, upload: UploadFile = File(...), db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, BaseConfig.SECRET_KEY, algorithms=[BaseConfig.ALGORITHM])
-        uuid: str = payload.get("sub")
-        user_uuid = uuid
-        db_user = db.query(models.User).filter(models.User.uuid == user_uuid, models.User.is_deleted == False, models.User.is_active == True).first()
-        if db_user:
-            extention = "png"
-            s3_file_path = 'ProfilePhoto' + '/' + str(user_uuid) + '.' + str(extention)
-            s3.upload_fileobj(upload.file, verification_bucket_name, s3_file_path)
-            url = s3.generate_presigned_url(ClientMethod = 'get_object', Params = { 'Bucket': verification_bucket_name, 'Key': s3_file_path }, ExpiresIn=None)
-            db_user.profile_photo = cloudfront_url + s3_file_path
-            db.commit()
-            call_log(logger, description='User Profile Photo uploaded', user_uuid=user_uuid, status_code=200, api=request.url.path, ip=request.client.host)
-            return { 'data' : db_user.profile_photo }
-        else:
-            raise HTTPException(status_code=400, detail='User not found')
-    except JWTError:
-        raise HTTPException(status_code=401, detail='Unauthorized')
 
