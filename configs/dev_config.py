@@ -22,12 +22,3 @@ class Configuration(BaseConfig):
     
     Redirect_URL = ' '                      # mention the url to redirect from user_mail after verification
     
-
-    AWS_ACCESS_KEY_ID = 'AKIAUEKOECNO4SFDBBXU'
-    AWS_SECRET_ACCESS_KEY = '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'
-    AWS_REGION = 'ap-south-1'
-    AWS_VERIFICATION_BUCKET_NAME = 'menem-verification-documents'
-    AWS_PROFILE_BUCKET_NAME = 'menem.profile'
-    AWS_NEWSFEED_BUCKET_NAME = 'menem.newsfeed'
- 
-    API_KEY_CHATGPT = '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'

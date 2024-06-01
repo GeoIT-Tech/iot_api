@@ -3,7 +3,7 @@ import string
 import bcrypt
 from resources.utils import email_validator, send_verification_email, otp_code, create_access_token, create_refresh_token, call_log, get_logger
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi import APIRouter, HTTPException, Depends, Request #,status
+from fastapi import APIRouter, HTTPException, Depends, Request
 from configs.base_config import BaseConfig
 from datetime import datetime, timedelta
 from sqlalchemy import or_
@@ -194,40 +194,6 @@ def Logout(request: Request, db: Session = Depends(get_db), token: str = Depends
             call_log(logger, description='logout Updated', user_uuid=user_uuid, status_code=200, api=request.url.path, ip=request.client.host)
             return { 'detail' : 'logout Updated' }
         else:
-            raise HTTPException(status_code=400, detail='User not found')
-    except JWTError:
-        raise HTTPException(status_code=401, detail='Unauthorized')
-
-@router.post('/check_user')
-def UserCheck( request: Request,  db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
-    try:
-        payload = jwt.decode(token, BaseConfig.SECRET_KEY, algorithms=[BaseConfig.ALGORITHM])
-        uuid: str = payload.get("sub")
-        user_uuid = uuid
-        db_user = db.query(models.User).filter(models.User.uuid == user_uuid, models.User.is_deleted == False, models.User.is_active == True).first()
-        if db_user:
-                access_token_expires = timedelta(minutes=BaseConfig.ACCESS_TOKEN_EXPIRE_MINUTES)
-                refresh_token_expires = timedelta(minutes=BaseConfig.REFRESH_TOKEN_EXPIRE_MINUTES)
-                access_token = create_access_token(data={"sub": str(db_user.uuid)}, expires_delta=access_token_expires)
-                refresh_token = create_refresh_token(data={"sub": str(db_user.uuid)}, expires_delta=refresh_token_expires)
-                call_log(logger, description='User logged in', user_uuid=db_user.uuid, status_code=200, api=request.url.path, ip=request.client.host)
-                del(db_user.hashed_password)
-                del(db_user.verification_code)
-                db_personal = db.query(models.Personal).filter(models.Personal.user_uuid == db_user.uuid).first()
-                if db_personal:
-                    db_user.personal = db_personal
-                db_organization = db.query(models.Organization).filter(models.Organization.user_uuid == db_user.uuid).first()
-                if db_organization:
-                    db_user.organization = db_organization
-                db_institute = db.query(models.EduInstitute).filter(models.EduInstitute.user_uuid == db_user.uuid).first()
-                if db_institute:
-                    db_user.institute = db_institute
-                db_settings = db.query(models.Setting.private_setting).filter(models.Setting.user_uuid == db_user.uuid).first()
-                if db_settings:
-                    db_user.setting = db_settings
-                return {'access_token': access_token, 'refresh_token': refresh_token, 'token_type': 'bearer', 'user': db_user }
-        else:
-            call_log(logger, description='User not found', user_uuid=db_user.uuid, status_code=400, api=request.url.path, ip=request.client.host)
             raise HTTPException(status_code=400, detail='User not found')
     except JWTError:
         raise HTTPException(status_code=401, detail='Unauthorized')

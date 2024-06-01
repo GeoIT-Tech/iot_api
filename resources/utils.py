@@ -124,34 +124,3 @@ def send_forgetpassword_email(username, to, subject, otp):
     except Exception as e:
             print(str(e))
             return { 'status': False, 'error': {'message': 'Sending Mail Failed'}}
-
-
-def common_elements(list1, list2):
-    result = []
-    for element in list1:
-        if element in list2:
-            result.append(element)
-    return result
-
-def mutual_list(db, request_uuid, user_uuid):
-    db_senders = db.query(models.Boosts).filter( models.Boosts.sender_uuid == request_uuid, models.Boosts.status=="Accepted").all()
-    db_receives = db.query(models.Boosts).filter(models.Boosts.receiver_uuid == request_uuid , models.Boosts.status=="Accepted").all()
-    boosting_lists=[]
-    for sender_ids in db_senders:
-        boosting_lists.append(sender_ids.receiver_uuid)
-    for receive_ids in db_receives:
-        boosting_lists.append(receive_ids.sender_uuid)
-    db_sender = db.query(models.Boosts).filter( models.Boosts.sender_uuid == user_uuid, models.Boosts.status=="Accepted").all()
-    db_receive = db.query(models.Boosts).filter(models.Boosts.receiver_uuid == user_uuid , models.Boosts.status=="Accepted").all()
-    boosting_list=[]
-    for sender_id in db_sender:
-        boosting_list.append(sender_id.receiver_uuid)
-    for receive_id in db_receive:
-        boosting_list.append(receive_id.sender_uuid)
-    mutual_list = common_elements(boosting_list, boosting_lists)
-    Mutuals = []
-    for mutual in mutual_list:
-        db_mutual = db.query(models.User).filter(models.User.uuid == mutual, models.User.is_deleted == False).first()
-        ml = { 'user_uuid' : mutual, 'MID' : db_mutual.MID, 'Proile_Image' : db_mutual.profile_photo, 'Full_name' : db_mutual.fullname, 'Tagline' : db_mutual.tagline }
-        Mutuals.append(ml)
-    return len(Mutuals)

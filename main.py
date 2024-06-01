@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import router
 
-app = FastAPI(title='MeNeM', version='1.0.0')       # mention title and version of project in the space respectively
+app = FastAPI(title='IoT_V1', version='1.0.0')       # mention title and version of project in the space respectively
 
 app.add_middleware(
 

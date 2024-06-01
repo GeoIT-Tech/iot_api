@@ -10,16 +10,6 @@ class RegisterUser(BaseModel):
     class Config:
         orm_mode = True
         
-        
-class RegisterMobileUser(BaseModel):
-    
-    fullname: str
-    dial_code: Optional[str] = None
-    mobile: str
-    password: str
-    
-    class Config:
-        orm_mode = True
 
 class OAuthUser(BaseModel):
     
