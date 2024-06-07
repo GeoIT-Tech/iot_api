@@ -7,7 +7,7 @@ import bcrypt
 import uuid
 from sqlalchemy.orm import sessionmaker, relationship
 
-# Base = declarative_base(bind=engine)
+Base = declarative_base(bind=engine)
 
 class User(Base):
 
