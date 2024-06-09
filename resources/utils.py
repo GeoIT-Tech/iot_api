@@ -24,7 +24,7 @@ class LogDBHandler(custom_logging.Handler):
             return None
 
         log_list = record.msg.split(',')
-        log_instance = models.MeNeMLog()
+        log_instance = models.ViLog()
         for key_value in log_list:
             key, value = key_value.split(':', 1)
             if not value:
@@ -92,7 +92,7 @@ def otp_code():
 
 def send_verification_email(username, to, subject, otp):
     try:
-        text = 'Hi {},\nThank you for being associated with our Vi-Smart Home Automation. Use the following OTP to complete your account procedures.\n{}\nOTP is valid for 10 minutes, Our executives never ask you about one time password. In case you have not logged in to your account. please contact our customer service . You can also write an email at geoit.techy@gmail.com\nRegards,\nMeNeM'.format(username, otp)
+        text = 'Hi {},\nThank you for being associated with our Vi-Smart Home Automation. Use the following OTP to complete your account procedures.\n{}\nOTP is valid for 10 minutes, Our executives never ask you about one time password. In case you have not logged in to your account. please contact our customer service . You can also write an email at geoit.techy@gmail.com\nRegards,\nVi-Smart'.format(username, otp)
         server = smtplib.SMTP(os.environ.get('SMTP_SERVER'), os.environ.get('SMTP_SERVER_NUM'))
         server.connect(os.environ.get('SMTP_SERVER'), os.environ.get('SMTP_SERVER_NUM'))
         server.ehlo()
@@ -110,7 +110,7 @@ def send_verification_email(username, to, subject, otp):
 
 def send_forgetpassword_email(username, to, subject, otp):
     try:
-        text = 'Hi {},\nThank you for being associated with our Vi-Smart Home Automation. Use the following OTP to reset your password.\n{}\nOTP is valid for 10 minutes, Our executives never ask you about one time password. In case you have not logged in to your account. please contact our customer service . You can also write an email at geoit.techy@gmail.com\nRegards,\nMeNeM'.format(username, otp)
+        text = 'Hi {},\nThank you for being associated with our Vi-Smart Home Automation. Use the following OTP to reset your password.\n{}\nOTP is valid for 10 minutes, Our executives never ask you about one time password. In case you have not logged in to your account. please contact our customer service . You can also write an email at geoit.techy@gmail.com\nRegards,\nVi-Smart'.format(username, otp)
         server = smtplib.SMTP(os.environ.get('SMTP_SERVER'), os.environ.get('SMTP_SERVER_NUM'))
         server.connect(os.environ.get('SMTP_SERVER'), os.environ.get('SMTP_SERVER_NUM'))
         server.ehlo()

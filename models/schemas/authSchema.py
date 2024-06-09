@@ -3,7 +3,7 @@ from typing import Optional
 
 class RegisterUser(BaseModel):
     
-    fullname: str
+    name: str
     email: str
     password: str
     

@@ -13,7 +13,7 @@ class User(Base):
 
     __tablename__ = 'users'
 
-    id = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
+    uuid = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
     name = Column(String)
     signup_type = Column(String)
     email = Column(String, unique=True)
@@ -42,5 +42,18 @@ class User(Base):
             return True
         else:
             return False
+
+class ViLog(Base):
+    
+    __tablename__ = 'vi_logs'
+    
+    uuid = Column(UUID(as_uuid=True), primary_key=True, unique=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('users.uuid') )
+    ip = Column(Text)
+    module = Column(String)
+    status_code = Column(Integer, default=200)
+    description = Column(Text)
+    api = Column(String)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)  
         
 # Base.metadata.create_all(bind=engine)

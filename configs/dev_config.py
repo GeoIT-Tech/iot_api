@@ -12,7 +12,6 @@ class Configuration(BaseConfig):
         'pw': os.environ.get('DB_PASSWORD'),
         'db': os.environ.get('DB_NAME'),
         'host': os.environ.get('DB_HOST'),
-        'port': os.environ.get('DB_PORT'),
         'port': int(os.environ.get('DB_PORT')),
         'ssl': ''
         }
