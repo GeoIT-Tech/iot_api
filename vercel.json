@@ -1,12 +1,12 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": ".",
-      "use": "@vercel/python",
-      "build": {
-        "commands": ["pip3.12 install --disable-pip-version-check --target . --upgrade -r requirements.txt"]
-      }
-    }
-  ]
+    { "src": "main.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/main.py" }
+  ],
+  "env": {
+    "APP_MODULE": "main:app"
+  }
 }
