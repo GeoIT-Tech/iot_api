@@ -43,6 +43,17 @@ class User(Base):
         else:
             return False
 
+class ResetPasswordCode(Base):
+    
+    __tablename__ = 'reset_password_code'
+
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
+    user_uuid = Column(UUID(as_uuid=True), ForeignKey('users.uuid'))
+    verification_code = Column(JSON)
+    consumed = Column(Boolean, default=False)
+    expired = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
 class ViLog(Base):
     
     __tablename__ = 'vi_logs'

@@ -1,7 +1,7 @@
 import random
 import string
 import bcrypt
-from resources.utils import email_validator, send_verification_email, otp_code, create_access_token, create_refresh_token, call_log, get_logger
+from resources.utils import email_validator, send_verification_email, send_forgetpassword_email, otp_code, create_access_token, create_refresh_token, call_log, get_logger
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import APIRouter, HTTPException, Depends, Request
 from configs.base_config import BaseConfig
@@ -11,6 +11,7 @@ from models.schemas import authSchema
 from sqlalchemy.orm import Session
 from models import models, get_db
 from jose import jwt, JWTError
+import datetime
 import secrets
 
 router = APIRouter()
@@ -85,11 +86,7 @@ def ResendOTP(request: Request, email: str, db: Session = Depends(get_db)):
                     raise HTTPException(status_code=400,detail=email_response['error']['message'])
         else:
             raise HTTPException(status_code=400, detail='Your Email is not registered with us')
-    
-def generate_random_string(length):
-   # letters_and_digits = string.ascii_letters + string.digits
-   # return ''.join(random.choice(letters_and_digits) for _ in range(length))
-    return ''.join(random.choice(string.digits) for _ in range(length))
+
             
 @router.patch('/verification/{email}')
 def UserVerification(request: Request, otp: int, email: str, db: Session = Depends(get_db)):
@@ -214,9 +211,8 @@ def UserVerification(request: Request, otp: int, password_data: authSchema.Reset
 @router.post('/login')
 def Login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     email = form_data.username.lower()
-    MID = form_data.username.lower()
     password = form_data.password
-    db_user = db.query(models.User).filter(or_(models.User.email == email, models.User.MID == MID)).first()
+    db_user = db.query(models.User).filter(models.User.email == email).first()
     if db_user:
         if db_user.verify_password(password):
             if db_user.is_active:
@@ -227,18 +223,6 @@ def Login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db
                 call_log(logger, description='User logged in', user_uuid=db_user.uuid, status_code=200, api=request.url.path, ip=request.client.host)
                 del(db_user.hashed_password)
                 del(db_user.verification_code)
-                db_personal = db.query(models.Personal).filter(models.Personal.user_uuid == db_user.uuid).first()
-                if db_personal:
-                    db_user.personal = db_personal
-                db_organization = db.query(models.Organization).filter(models.Organization.user_uuid == db_user.uuid).first()
-                if db_organization:
-                    db_user.organization = db_organization
-                db_institute = db.query(models.EduInstitute).filter(models.EduInstitute.user_uuid == db_user.uuid).first()
-                if db_institute:
-                    db_user.institute = db_institute
-                db_settings = db.query(models.Setting.private_setting).filter(models.Setting.user_uuid == db_user.uuid).first()
-                if db_settings:
-                    db_user.setting = db_settings
                 return {'access_token': access_token, 'refresh_token': refresh_token, 'token_type': 'bearer', 'user': db_user }
             else:
                 call_log(logger, description='User is not verified', status_code=400, api=request.url.path, ip=request.client.host)
