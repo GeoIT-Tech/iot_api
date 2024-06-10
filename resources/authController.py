@@ -41,7 +41,7 @@ def PostUser(request: Request, user: authSchema.RegisterUser, db: Session = Depe
         call_log(logger, description='Please enter a valid E-Mail', status_code=400, api=request.url.path, ip=request.client.host)
         raise HTTPException(status_code=400,detail='Please enter a valid E-Mail')
     code = otp_code()
-    expiration_time = datetime.utcnow()+timedelta(minutes=10)
+    expiration_time = datetime.datetime.utcnow()+timedelta(minutes=10)
     db_user= models.User(email = user.email, name = user.name, verification_code = {'code':code, 'expires_at':expiration_time.strftime('%y-%m-%d %H:%M:%S')})
     db_user.hash_password(user.password)
     db_user.signup_type = "Email"
